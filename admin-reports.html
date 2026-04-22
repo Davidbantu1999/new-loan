@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>SR Finance — Reports</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="admin-shared.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#080d1a;--bg2:#0d1225;--card:#111827;--card2:#162035;--card3:#1a2540;
+  --accent:#7c6dfa;--accent2:#5b8def;
+  --accent-soft:rgba(124,109,250,.12);--accent-glow:rgba(124,109,250,.22);
+  --green:#22c55e;--green2:#16a34a;--red:#f43f5e;--red2:#be123c;
+  --yellow:#f59e0b;--purple:#a78bfa;--cyan:#06b6d4;--blue:#3b82f6;
+  --white:#ffffff;--muted:#6b7a99;--muted2:#8896b3;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.04);
+  --shadow:0 8px 32px rgba(0,0,0,.6);--sb-w:230px;
+  --bn-h:62px;
+}
+
+html,body{min-height:100%;font-family:'Inter',sans-serif;color:var(--white);background:var(--bg);-webkit-font-smoothing:antialiased;font-size:14px;overflow-x:hidden;max-width:100vw;}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,109,250,.3);border-radius:2px}
+
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .4s}
+#loader.hide{opacity:0;pointer-events:none}
+.ld-wrap{position:relative;width:70px;height:70px;display:flex;align-items:center;justify-content:center}
+.ld-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(124,109,250,.15);border-top-color:var(--accent);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld-logo{font-size:20px;font-weight:900;color:var(--accent)}.ld-title{font-size:17px;font-weight:800;color:var(--white)}.ld-sub{font-size:11px;color:var(--muted)}
+.ld-bar-wrap{width:180px;height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden}.ld-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:1px;transition:width .3s}
+.ld-pct{font-size:13px;font-weight:800;color:var(--accent)}
+
+.app-layout{display:flex;min-height:100vh;width:100%;overflow-x:hidden}
+.sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;backdrop-filter:blur(6px)}.sb-ov.show{display:block}
+
+.sidebar{width:var(--sb-w);background:#0a0f1e;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100%;z-index:160;transition:left .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;overflow-x:hidden;}
+.sb-top{padding:22px 18px 18px;border-bottom:1px solid var(--border)}.sb-brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.sb-logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff}
+.sb-brand-name{font-size:14px;font-weight:800;color:var(--white)}.sb-brand-sub{font-size:9px;color:var(--muted);margin-top:1px}
+.sb-profile{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border-radius:12px;border:1px solid var(--border)}
+.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px}
+.sb-pname{font-size:12px;font-weight:700;color:var(--white)}.sb-prole{font-size:9px;color:var(--accent);font-weight:600;margin-top:1px}
+.sb-nav{flex:1;padding:14px 10px;overflow-y:auto}.sb-sec-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:8px 8px 4px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;background:transparent;color:var(--muted2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;text-decoration:none}
+.sb-item:hover{background:rgba(124,109,250,.1);color:var(--white)}.sb-item.active{background:rgba(124,109,250,.15);color:var(--accent);border-left:3px solid var(--accent)}
+.sb-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}.sb-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:50px}
+.sb-div{border:none;border-top:1px solid var(--border);margin:8px 4px}.sb-logout{color:var(--red)!important}.sb-logout:hover{background:rgba(244,63,94,.1)!important}
+.sb-footer{padding:14px 18px;border-top:1px solid var(--border)}.sb-footer p{font-size:10px;color:var(--muted)}
+
+.main-wrap{flex:1;margin-left:var(--sb-w);min-height:100vh;display:flex;flex-direction:column;min-width:0;overflow-x:hidden}
+
+.topbar{position:sticky;top:0;z-index:80;background:rgba(8,13,26,.97);border-bottom:1px solid var(--border);padding:12px 22px;backdrop-filter:blur(20px);display:flex;align-items:center;gap:14px;width:100%}
+.ham{display:none;width:38px;height:38px;min-width:38px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--muted2);font-size:14px;cursor:pointer;align-items:center;justify-content:center;transition:all .15s}
+.ham:hover{color:var(--accent);border-color:rgba(124,109,250,.3)}
+.topbar-title{font-size:15px;font-weight:800;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.topbar-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.srch-wrap-tb{position:relative;width:200px;flex-shrink:0}.srch-tb{width:100%;padding:9px 14px 9px 36px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--white);font-size:12px;font-family:'Inter',sans-serif;transition:border .15s}
+.srch-tb:focus{outline:none;border-color:rgba(124,109,250,.4);background:var(--card2)}.srch-tb::placeholder{color:var(--muted)}
+.srch-icon-tb{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none}
+.topbar-right{display:flex;gap:8px;align-items:center;margin-left:auto;flex-shrink:0}
+.topbar-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;cursor:pointer}
+.hbtn{padding:8px 14px;border-radius:10px;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;border:1px solid var(--border);background:transparent}
+.hbtn.accent{background:var(--accent-soft);color:var(--accent);border-color:rgba(124,109,250,.3)}.hbtn.danger{background:rgba(244,63,94,.12);color:var(--red);border-color:rgba(244,63,94,.25)}
+
+.nav-wrap{background:rgba(8,13,26,.95);border-bottom:1px solid var(--border);position:sticky;top:61px;z-index:70;backdrop-filter:blur(12px);width:100%}
+.nav-tabs{max-width:100%;display:flex;overflow-x:auto;padding:0 8px;-webkit-overflow-scrolling:touch}.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:13px 18px;border:none;background:transparent;color:var(--muted2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s;text-decoration:none}
+.nav-tab:hover{color:var(--white)}.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.notif-count{background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;display:none;min-width:16px;text-align:center}.notif-count.show{display:inline-block}
+
+.page{padding:20px 22px;flex:1;min-width:0;overflow-x:hidden}
+
+.card-box{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.card-box-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card-box-title{font-size:13px;font-weight:700;color:var(--white);flex:1;display:flex;align-items:center;gap:7px;min-width:0}
+.card-box-body{padding:16px 18px}
+
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+@media(min-width:480px){.stat-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.stat-grid{grid-template-columns:repeat(6,1fr)}}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 13px;box-shadow:var(--shadow);cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.scard.c-accent::before{background:var(--accent)}.scard.c-green::before{background:var(--green)}.scard.c-yellow::before{background:var(--yellow)}.scard.c-red::before{background:var(--red)}.scard.c-purple::before{background:var(--purple)}.scard.c-cyan::before{background:var(--cyan)}
+.scard:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.5);border-color:rgba(124,109,250,.2)}
+.scard-icon{font-size:20px;margin-bottom:8px}.scard-val{font-size:24px;font-weight:900;margin-bottom:3px;font-family:'Inter',sans-serif;color:var(--white);letter-spacing:-1px}
+.scard-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700}.scard-date{font-size:9px;color:var(--muted);margin-top:2px}
+
+.report-range-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:11px 16px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border)}
+.report-range-row label{font-size:11px;font-weight:700;color:var(--muted2);white-space:nowrap}
+.report-range-row select,.report-range-row input[type=date]{padding:7px 11px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--white);font-size:11px;font-family:'Inter',sans-serif;margin:0 5px}
+.report-range-row select:focus,.report-range-row input:focus{outline:none;border-color:rgba(124,109,250,.4)}
+
+.report-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:14px 16px}
+@media(min-width:480px){.report-stats-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.report-stats-grid{grid-template-columns:repeat(6,1fr)}}
+
+.user-table-wrap{overflow-x:auto;padding:0 16px 14px;-webkit-overflow-scrolling:touch}
+.user-table{width:100%;border-collapse:collapse;font-size:12px}
+.user-table th{padding:10px 12px;background:rgba(124,109,250,.12);color:var(--muted2);font-weight:700;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.user-table td{padding:10px 12px;border-bottom:1px solid var(--border2);vertical-align:middle;white-space:nowrap;color:var(--muted2)}
+.user-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}.user-table tr:hover td{background:rgba(124,109,250,.06)}
+.user-rank{background:var(--accent-soft);color:var(--accent);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:11px}
+.user-amt{font-weight:900;color:var(--green);font-size:13px}
+
+.report-table-wrap{overflow-x:auto;padding:0 16px 14px;-webkit-overflow-scrolling:touch}
+.report-table{width:100%;border-collapse:collapse;font-size:11px}
+.report-table th{padding:9px 10px;background:rgba(255,255,255,.03);color:var(--muted);font-weight:700;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.report-table td{padding:8px 10px;border-bottom:1px solid var(--border2);border-right:1px solid var(--border2);vertical-align:middle;white-space:nowrap;color:var(--muted2)}
+.report-table tr:nth-child(odd) td{background:rgba(255,255,255,.015)}.report-table tr:hover td{background:rgba(124,109,250,.06)!important}
+.rt-status{padding:3px 8px;border-radius:50px;font-size:9px;font-weight:900;white-space:nowrap;border:1px solid}.rt-id{color:var(--accent);font-weight:700}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2035;border:1px solid rgba(124,109,250,.25);color:var(--white);padding:11px 22px;border-radius:50px;font-size:12px;opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(8,13,26,.98);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:90;padding-top:0;padding-bottom:max(8px, env(safe-area-inset-bottom));}
+.bn-inner{display:flex;align-items:flex-end;justify-content:space-around;padding:0 4px;height:var(--bn-h);}
+.bn-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:6px 10px;border-radius:10px;color:var(--muted);transition:all .15s;text-decoration:none;border:none;background:transparent;font-family:'Inter',sans-serif;flex:1;max-width:80px;align-self:center;}
+.bn-item.active{color:var(--accent)}.bn-item:active{transform:scale(.9)}.bn-icon{font-size:17px;line-height:1}.bn-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1}
+.bn-center-wrap{flex:1;max-width:80px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;}
+.bn-center{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;box-shadow:0 4px 20px rgba(124,109,250,.5);cursor:pointer;border:none;transition:transform .15s,box-shadow .15s;flex-shrink:0;}
+.bn-center:active{transform:scale(.93);box-shadow:0 2px 10px rgba(124,109,250,.4)}
+
+.tbtn{padding:9px 15px;border-radius:11px;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--muted2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.tbtn:active{transform:scale(.95)}.tbtn.green{background:rgba(34,197,94,.1);color:var(--green);border-color:rgba(34,197,94,.25)}
+
+@media(max-width:767px){
+  .sidebar{left:calc(-1 * var(--sb-w))}.sidebar.show{left:0}.main-wrap{margin-left:0;width:100%;max-width:100vw}.ham{display:flex}.srch-wrap-tb{display:none}
+  .topbar{padding:11px 14px;width:100%}.topbar-title{font-size:13px}.page{padding:14px 12px calc(var(--bn-h) + 28px + env(safe-area-inset-bottom))}.bottom-nav{display:block}
+  .toast{bottom:calc(var(--bn-h) + 10px)}.nav-wrap{top:60px}.scard-val{font-size:18px}.stat-grid{gap:7px}
+}
+@media(max-width:360px){.topbar{padding:10px 10px}.page{padding:12px 10px calc(var(--bn-h) + 28px + env(safe-area-inset-bottom))}.scard-val{font-size:16px}.bn-item{padding:6px 6px;max-width:60px}.bn-center{width:48px;height:48px;font-size:20px}}
+@media(min-width:768px) and (max-width:1099px){:root{--sb-w:190px}}
+@media(min-width:1200px){.page{padding:24px 28px}}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-wrap"><div class="ld-ring"></div><div class="ld-logo">SF</div></div>
+  <div class="ld-title">SR Finance Admin</div>
+  <div class="ld-sub" id="ldSub">Loading Reports…</div>
+  <div class="ld-bar-wrap"><div class="ld-bar" id="ldBar"></div></div>
+  <div class="ld-pct" id="ldPct">0%</div>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sb-ov" id="sbOv" onclick="tSB()"></div>
+
+<div class="app-layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sbMenu">
+  <div class="sb-top">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="fas fa-chart-line"></i></div>
+      <div>
+        <div class="sb-brand-name">SR Finance</div>
+        <div class="sb-brand-sub">Admin Panel</div>
+      </div>
+    </div>
+    <div class="sb-profile">
+      <div class="sb-av" id="sbAv">A</div>
+      <div>
+        <div class="sb-pname" id="sbName">Admin</div>
+        <div class="sb-prole"><i class="fas fa-shield-alt" style="font-size:8px;margin-right:3px"></i>Administrator</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec-lbl">Main</div>
+    <a href="admin-dashboard.html" class="sb-item" id="sb-dashboard"><span class="sb-icon"><i class="fas fa-chart-pie"></i></span>Dashboard</a>
+    <a href="admin-customers.html" class="sb-item" id="sb-customers"><span class="sb-icon"><i class="fas fa-users"></i></span>Customers</a>
+    <a href="admin-reports.html" class="sb-item active" id="sb-reports"><span class="sb-icon"><i class="fas fa-file-alt"></i></span>Reports</a>
+    <a href="admin-dellog.html" class="sb-item" id="sb-dellog"><span class="sb-icon"><i class="fas fa-trash"></i></span>Deleted <span class="sb-badge" id="delCountSb" style="display:none"></span></a>
+    <a href="collection.html" class="sb-item"><span class="sb-icon"><i class="fas fa-rupee-sign"></i></span>Collection</a>
+    <a href="expenses.html" class="sb-item"><span class="sb-icon"><i class="fas fa-chart-bar"></i></span>Expenses</a>
+    <a href="index.html" class="sb-item"><span class="sb-icon"><i class="fas fa-plus-circle"></i></span>New Loan</a>
+    <hr class="sb-div"/>
+    <div class="sb-sec-lbl">Admin</div>
+    <a href="admin-users.html" class="sb-item"><span class="sb-icon"><i class="fas fa-users-cog"></i></span>Users</a>
+    <hr class="sb-div"/>
+    <button class="sb-item sb-logout" onclick="doLogout()"><span class="sb-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</button>
+  </nav>
+  <div class="sb-footer"><p>SR Finance © 2025 · v2.0</p></div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <button class="ham" onclick="tSB()"><i class="fas fa-bars"></i></button>
+  <div style="flex:1">
+    <div class="topbar-title">SR Finance Admin</div>
+    <div class="topbar-sub" id="hdrSub">Admin Panel</div>
+  </div>
+  <div class="srch-wrap-tb">
+    <span class="srch-icon-tb"><i class="fas fa-search"></i></span>
+    <input type="text" class="srch-tb" id="srchTb" placeholder="Search customers…" oninput="onSrchTb()"/>
+  </div>
+  <div class="topbar-right">
+    <button class="hbtn danger" onclick="openResetModal()"><i class="fas fa-exclamation-circle"></i> Reset</button>
+    <div class="topbar-av" id="topAv" onclick="doLogout()" title="Logout">A</div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-wrap">
+  <div class="nav-tabs">
+    <a class="nav-tab" href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a class="nav-tab" href="admin-customers.html"><i class="fas fa-users"></i> Customers</a>
+    <a class="nav-tab active" href="admin-reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+    <a class="nav-tab" href="admin-dellog.html"><i class="fas fa-trash"></i> Deleted <span class="notif-count" id="delCount"></span></a>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+<!-- REPORTS SECTION -->
+<div class="card-box">
+  <div class="card-box-hdr">
+    <div class="card-box-title"><i class="fas fa-file-alt" style="color:var(--accent)"></i> Collection Report</div>
+    <button class="tbtn green" onclick="downloadReportCSV()"><i class="fas fa-download"></i> Download CSV</button>
+  </div>
+  <div class="report-range-row">
+    <label>Range:</label>
+    <select id="reportRange" onchange="onReportRangeChange()">
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+      <option value="all">All Time</option>
+      <option value="custom">Custom Date</option>
+    </select>
+    <div id="customDateFields" style="display:none;gap:6px;align-items:center;flex-wrap:wrap">
+      <label>From:</label><input type="date" id="reportFrom" onchange="buildReport()"/>
+      <label>To:</label><input type="date" id="reportTo" onchange="buildReport()"/>
+    </div>
+  </div>
+  <div class="report-stats-grid" id="reportStats"></div>
+  <div style="padding:0 16px 10px;font-size:10px;color:var(--muted)" id="reportDateLbl"></div>
+</div>
+
+<div class="card-box">
+  <div class="card-box-hdr"><div class="card-box-title"><i class="fas fa-user-circle" style="color:var(--accent)"></i> Collection by User</div></div>
+  <div class="user-table-wrap">
+    <table class="user-table">
+      <thead><tr><th>#</th><th>Collector</th><th>Payments</th><th>Total Collected</th></tr></thead>
+      <tbody id="userTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card-box">
+  <div class="card-box-hdr"><div class="card-box-title"><i class="fas fa-table" style="color:var(--accent2)"></i> Customer Details</div></div>
+  <div class="report-table-wrap">
+    <table class="report-table">
+      <thead><tr>
+        <th>#</th><th>ID</th><th>Name</th><th>Parent</th><th>Phone</th><th>Address</th>
+        <th>Loan</th><th>Int%</th><th>Comm</th><th>Receives</th><th>Int Amt</th><th>Total Pay</th>
+        <th>Installment</th><th>Type</th><th>Paid</th><th>Pending</th><th>Progress</th>
+        <th>Status</th><th>Last Pay</th><th>Start</th><th>Today ₹</th>
+      </tr></thead>
+      <tbody id="reportBody"></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bn-inner">
+    <button class="bn-item" onclick="window.location.href='admin-dashboard.html'">
+      <div class="bn-icon"><i class="fas fa-chart-pie"></i></div><div class="bn-lbl">Dashboard</div>
+    </button>
+    <button class="bn-item" onclick="window.location.href='admin-customers.html'">
+      <div class="bn-icon"><i class="fas fa-users"></i></div><div class="bn-lbl">Customers</div>
+    </button>
+    <div class="bn-center-wrap">
+      <div class="bn-center" onclick="window.location.href='loan-registration.html'"><i class="fas fa-plus"></i></div>
+    </div>
+    <button class="bn-item active" onclick="window.location.href='admin-reports.html'">
+      <div class="bn-icon"><i class="fas fa-file-alt"></i></div><div class="bn-lbl">Reports</div>
+    </button>
+    <a href="admin-dellog.html" class="bn-item">
+      <div class="bn-icon"><i class="fas fa-trash"></i></div><div class="bn-lbl">Deleted</div>
+    </a>
+  </div>
+</nav>
+
+</div><!-- /main-wrap -->
+</div><!-- /app-layout -->
+
+<div class="toast" id="toast"></div>
+
+<!-- RESET MODAL -->
+<div class="modal" id="resetM" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:200;align-items:flex-end;justify-content:center;padding:0">
+  <div class="mc" style="text-align:center;max-width:360px;width:100%;max-width:520px;background:#0e1527;border-radius:24px 24px 0 0;padding:6px 20px 30px;border:1px solid rgba(124,109,250,.12);max-height:92vh;overflow-y:auto">
+    <div class="modal-handle" style="width:38px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:10px auto 16px"></div>
+    <div style="font-size:17px;font-weight:800;color:var(--white);margin-bottom:16px">Reset All Data</div>
+    <div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);border-radius:12px;padding:11px;margin-bottom:14px;font-size:11px;color:var(--red);font-weight:700">⚠️ Permanent deletion. Cannot undo.</div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:10px;font-weight:600">Enter Admin PIN:</div>
+    <input type="password" id="resetPin" inputmode="numeric" maxlength="4" placeholder="• • • •" style="width:100%;padding:14px;border-radius:12px;border:2px solid rgba(244,63,94,.3);background:rgba(255,255,255,.04);color:var(--white);font-size:26px;text-align:center;letter-spacing:12px;font-family:'Inter',sans-serif;margin-bottom:6px"/>
+    <div id="resetPinErr" style="color:var(--red);font-size:11px;font-weight:700;margin-bottom:10px;display:none">❌ Wrong PIN.</div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button onclick="confirmReset()" style="flex:1;background:rgba(244,63,94,.12);color:var(--red);border:1px solid rgba(244,63,94,.25);cursor:pointer;font-weight:700;border-radius:12px;padding:12px 16px;font-family:'Inter',sans-serif;font-size:13px"><i class="fas fa-trash"></i> Delete Everything</button>
+      <button onclick="closeResetModal()" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted2);cursor:pointer;font-weight:700;border-radius:12px;padding:12px 16px;font-family:'Inter',sans-serif;font-size:13px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="admin-shared.js"></script>
+<script>
+window.addEventListener('load',function(){
+  hideLoader();
+  buildReport();
+});
+</script>
+</body>
+</html>
